@@ -86,6 +86,6 @@
         "count_chars.c": "cd $dir && cc $fileName && echo 'hey adam    whats up  ? 1  23 999' | ./a.out",
         "word_length_histogram.c": "cd $dir && cc $fileName && echo 'hey adam whats   up  with u' | ./a.out",
         "call_by_value.c": "cd $dir && cc $fileName && cat call_file | ./a.out",
-        "80_longer.c": "cd $dir && cc $fileName && cat call_file | ./a.out"
+        "1-17.c": "cd $dir && cc $fileName && cat call_file | ./a.out"
     }
 }
