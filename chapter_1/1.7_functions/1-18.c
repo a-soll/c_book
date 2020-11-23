@@ -7,6 +7,7 @@ int get_line(char line[], int maxline);
 void trim_line(char line[], int len);
 void copy(char to[], char from[], int len);
 
+// Write a program to remove trailing blanks and tabs from each line of input, and to delete entirely blank lines.
 int main(int argc, char const *argv[]) {
     char input[MAXLINE];
     char line[MAXLINE];
