@@ -1,1 +1,4 @@
 *.out
+test.c
+*.dSYM
+.vscode
