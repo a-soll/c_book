@@ -30,7 +30,11 @@ void trim_line(char input[], int len) {
             n = i;
         }
     }
-    input[n + 1] = '\0';
+    if (n > 0) {
+        input[n + 1] = '\0';
+    } else {
+        input[n] = '\0';
+    }
 }
 
 int get_line(char s[], int lim) {
@@ -58,6 +62,7 @@ void copy(char to[], char from[]) {
         to[i] = from[i];
         i++;
     }
+    to[i] = '\0';
 }
 
 int white_check(char s) {
