@@ -2,55 +2,95 @@
 #include <stdio.h>
 
 #define MAXLINE 1000
+#define true 1
+#define false 0
 
 int get_line(char in[]);
-void remove_comments(char in[], int len);
+int comment_check(char a, char b);
+void remove_comments(char in[], char out[], int len);
+int inline_check(char a, char b);
+int block_start(char a, char b);
+int block_end(char a, char b);
+
+int block = false;
+int quote = false;
 
 int main() {
     int len;
     char in[MAXLINE];
+    char out[MAXLINE];
 
-    len = get_line(in);
-    printf("%d\n", len);
-    remove_comments(in, len);
-    printf("%s", in);
-
+    while ((len = get_line(in)) > 0) {
+        remove_comments(in, out, len);
+        printf("%s", out);
+    }
     return 0;
 }
 
 int get_line(char in[]) {
     int i, c;
-    for (i = 0; i < MAXLINE - 1 && (c = getchar()) != EOF; i++) {
+
+    for (i = 0; i < MAXLINE - 1 && (c = getchar()) != EOF && c != '\n'; i++) {
         in[i] = c;
     }
-    if (c == EOF) {
-        in[i] = '\0';
+    if (c == '\n') {
+        in[i] = c;
+        i++;
     }
-
+    in[i] = '\0';
     return i;
 }
 
-void remove_comments(char in[], int len) {
+void remove_comments(char in[], char out[], int len) {
     int i;
-    int spot = 0;    // used to overwrite commented lines with non-comments
-    int in_line = 0; // 1 if comment is inline
+    int comment = false;
 
-    for (i = 0; i < len - 1; i++) {
-        if (in[i] == '/' && in[i + 1] == '/') {
-            while (in[i] != '\n') {
-                i++;
+    for (i = 0; i < len; i++) {
+        comment = comment_check(in[i], in[i + 1]);
+        if (in[i] == '"') {
+            if (quote) {
+                quote = false;
+            } else {
+                quote = true;
             }
-            if (in_line == 1) { // if inline comment, preserve newline
-                i--;
+        }
+        if (!quote && !block) { // check for start of block comment
+            block = block_start(in[i], in[i + 1]);
+        }
+        if (!quote && block) { // check for end of block comment
+            int i = 0;
+            while (in[i++] && block) {
+                block = block_end(in[i], in[i + 1]);
             }
+            in[i] = '\0';
+        }
+        if ((comment || block) && !quote) {
+            out[i] = '\0';
+            break;
         } else {
-            in_line = 1;
-            in[spot] = in[i];
-            spot++;
+            out[i] = in[i];
         }
-        if (in[i] == '\n') { // reset inline each line
-            in_line = 0;
-        }
+        out[i + 1] = '\0';
     }
-    in[spot] = '\0';
+}
+
+int comment_check(char a, char b) {
+    if (a == '/' && b == '/') {
+        return true;
+    }
+    return false;
+}
+
+int block_start(char a, char b) {
+    if (a == '/' && b == '*') {
+        return true;
+    }
+    return false;
+}
+
+int block_end(char a, char b) {
+    if (a == '*' && b == '/') {
+        return false;
+    }
+    return true;
 }

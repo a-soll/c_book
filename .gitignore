@@ -3,3 +3,5 @@ test.c
 *.dSYM
 .vscode
 chapter_1
+param.txt
+call_file
