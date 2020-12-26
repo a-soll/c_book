@@ -1,4 +1,4 @@
-// 2020-11-07
+// 11-07-2020
 #include <stdio.h>
 
 #define MAXLINE 1000

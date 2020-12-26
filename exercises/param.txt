@@ -1,12 +1,12 @@
+"
 // 12-19-2020
 #include <stdio.h>
-
 #define MAXLINE 1000
 
 extern int n;
 int get_line(char line[]);
 
-// Write a program called detab that replaces tabs in the input with the proper
+// Write a program called tedab that replaces tabs in the input with the proper
 // number of blanks to create space to the next tab stop assume a fixed set of tab stops,
 // say every n columns. Should n be a variable or symbolic parameter?
 int main() {
@@ -31,3 +31,4 @@ int get_line(char line[]) {
 
     return i;
 }
+"
