@@ -7,12 +7,15 @@ int htoi(char s[]) {
 
     n = 0;
     while (s[i]) {
+        int digit;
         if (s[i] >= '0' && s[i] <= '9') {
-            n = 16 * n + (s[i] - '0');
+            digit = (s[i] - '0');
+        } else if (s[i] >= 'A' && s[i] <= 'F') {
+            digit = (s[i] - 'A' + 10);
+        } else {
+            break;
         }
-        if (s[i] >= 'A' && s[i] <= 'F') {
-            n = 16 * n + (s[i] - 'A' + 10);
-        }
+        n = 16 * n + digit;
         i++;
     }
     return n;
