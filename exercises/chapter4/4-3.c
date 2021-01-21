@@ -3,73 +3,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAXOP 100  // max size of operand or operator
-#define NUMBER '0' // signal that a number was found
-#define MAXVAL 100 // maximum depth of val stack
-#define BUFSIZE 100
+#define MAXOP 100
+#define NUMBER '0' // signal number was found
 
-char buf[BUFSIZE]; // buffer for ungetch
-int bufp = 0; // next free position in buf
+char inp[MAXOP] = "-5.7735 3 / 7 * 5 -"; // calculator input
+int ind = 0;                        // input index
+double val[MAXOP];                  // current stack
+int sp;                             // stack pointer
+char buf[MAXOP];                    // bufer
+int bufp = 0;
 
-int getop(char[]);
-void push(double);
-double pop(void);
-int getch(void);
-void ungetch(int);
-
-// reverse Polish calculator
-int main() {
-    int type;
-    double op2;
-    char s[MAXOP];
-
-    while ((type = getop(s)) != EOF) {
-        switch (type) {
-        case NUMBER:
-            push(atof(s));
-            break;
-        case '+':
-            push(pop() + pop());
-            break;
-        case '*':
-            push(pop() * pop());
-            break;
-        case '-':
-            op2 = pop();
-            push(pop() - op2);
-            break;
-        case '/':
-            if (op2 != 0.0) {
-                push(pop() / op2);
-            } else {
-                printf("error: zero divisor\n");
-            }
-            break;
-        case '\n':
-            printf("\t%.8g\n", pop());
-            break;
-        default:
-            printf("error: unknown command %s\n", s);
-            break;
-        }
-    }
-    return 0;
+int getch() { // get char from inp[] if buffer empty
+    return (bufp > 0) ? buf[--bufp] : inp[ind++];
 }
 
-int sp = 0;
-double val[MAXVAL];
-
-// push: push f onto value stack
-void push(double f) {
-    if (sp < MAXVAL) {
-        val[sp++] = f;
-    } else {
-        printf("error: stack full, can't push %g\n", f);
-    }
+void ungetch(int c) {
+    buf[bufp++] = c;
 }
 
-// pop: pop and return top value from stack
-double pop(void) {
+double pop() {
     if (sp > 0) {
         return val[--sp];
     } else {
@@ -78,35 +30,70 @@ double pop(void) {
     }
 }
 
-int getop(char s[]) {
-    int i, c;
+void push(double f) {
+    if (sp < MAXOP) {
+        val[sp++] = f;
+    } else {
+        printf("stack full. can't push %g\n", f);
+    }
+}
 
-    while ((s[0] = c = getch()) == ' ' || c == '\t')
+int getop(char s[]) {
+    int c;
+    int j = 0;
+
+    while ((s[0] = c = getch()) == ' ')
         ;
     s[1] = '\0';
-    if (!isdigit(c) && c != '.') {
-        return c; // not a number
+    if (!isdigit(c) && !isdigit(inp[ind])) { // return operation
+        return c;
     }
-    i = 0;
-    if (isdigit(c)) { // collect integer part
-        while (isdigit(s[++i] = c = getch()));
+    if (!isdigit(c)) {
+        if (isdigit(c = getch())) {
+            s[++j] = c;
+        }
     }
-    s[i] = '\0';
+    if (isdigit(c) || c == '.') {
+        while (isdigit(s[++j] = c = getch()) || c == '.') // collect '.' as part of double
+            ;
+    }
+    s[j] = '\0';
     if (c != EOF) {
-        ungetch(c);
+        ungetch(c); // add c to buffer
     }
     return NUMBER;
 }
 
-int getch() { // get a (possibly pushed back) character
-    return (bufp > 0) ? buf[--bufp] : getchar();
-}
+// Reverse Polish calculator that accounts for negative numbers
+int main() {
+    char s[MAXOP];
+    int type;
+    double op2;
 
-void ungetch(int c){ // push character back on input
-    if (bufp >= BUFSIZE) {
-        printf("ungetch: too many characters\n");
+    while ((type = getop(s)) != '\0') {
+        switch (type) {
+        case NUMBER:
+            push(atof(s));
+            break;
+        case '-':
+            op2 = pop();
+            push(pop() - op2);
+            break;
+        case '+':
+            push(pop() + pop());
+            break;
+        case '*':
+            push(pop() * pop());
+            break;
+        case '/':
+            op2 = pop();
+            push(pop() / op2);
+            break;
+        default:
+            printf("error\n");
+            break;
+        }
     }
-    else {
-        buf[bufp++] = c;
-    }
+    printf("%f", pop());
+    return 0;
 }
